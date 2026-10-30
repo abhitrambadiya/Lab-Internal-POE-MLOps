@@ -1,6 +1,6 @@
 """
 Professional PDF Report Generator for MLOps Lab Internal POE.
-Generates an executive UAT Dry Run and Tool Implementation Report.
+Generates an executive UAT Dry Run and Tool Implementation Report with GitHub link.
 """
 from pathlib import Path
 from reportlab.lib.pagesizes import letter
@@ -12,6 +12,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfgen import canvas
 
 PDF_PATH = "Lab Internal POE/output/MLOps_Internal_POE_Report.pdf"
+GITHUB_REPO_URL = "https://github.com/abhitrambadiya/Lab-Internal-POE-MLOps"
 
 class NumberedCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
@@ -53,6 +54,7 @@ class NumberedCanvas(canvas.Canvas):
         self.restoreState()
 
 def build_pdf():
+    Path("Lab Internal POE/output").mkdir(parents=True, exist_ok=True)
     doc = SimpleDocTemplate(
         PDF_PATH,
         pagesize=letter,
@@ -67,60 +69,58 @@ def build_pdf():
     # Custom Palette
     c_primary = colors.HexColor("#0F172A")    # Slate 900
     c_accent = colors.HexColor("#2563EB")     # Blue 600
-    c_success = colors.HexColor("#16A34A")    # Green 600
     c_dark = colors.HexColor("#1E293B")       # Slate 800
-    c_muted = colors.HexColor("#475569")      # Slate 600
     c_bg_light = colors.HexColor("#F8FAFC")   # Slate 50
-    c_border = colors.HexColor("#E2E8F0")     # Slate 200
+    c_border = colors.HexColor("#CBD5E1")     # Slate 300
     
     # Custom Typography Styles
     title_style = ParagraphStyle(
         'DocTitle',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=22,
-        leading=26,
+        fontSize=20,
+        leading=24,
         textColor=c_primary,
-        spaceAfter=6
+        spaceAfter=4
     )
     
     subtitle_style = ParagraphStyle(
         'DocSubtitle',
         parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=12,
-        leading=16,
+        fontName='Helvetica-Bold',
+        fontSize=11,
+        leading=15,
         textColor=c_accent,
-        spaceAfter=14
+        spaceAfter=10
     )
     
     h1_style = ParagraphStyle(
         'Heading1_Custom',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=13,
-        leading=17,
+        fontSize=12,
+        leading=16,
         textColor=c_primary,
-        spaceBefore=12,
-        spaceAfter=6
+        spaceBefore=10,
+        spaceAfter=5
     )
     
     body_style = ParagraphStyle(
         'Body_Custom',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=9.5,
-        leading=13.5,
+        fontSize=9,
+        leading=13,
         textColor=c_dark,
-        spaceAfter=6
+        spaceAfter=5
     )
 
     code_style = ParagraphStyle(
         'Code_Block',
         parent=styles['Normal'],
         fontName='Courier',
-        fontSize=8.5,
-        leading=11.5,
+        fontSize=8,
+        leading=11,
         textColor=colors.HexColor("#0F172A")
     )
     
@@ -128,8 +128,8 @@ def build_pdf():
         'Meta_Text',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=9,
-        leading=12,
+        fontSize=8.5,
+        leading=11.5,
         textColor=c_dark
     )
 
@@ -137,9 +137,18 @@ def build_pdf():
         'Meta_Bold',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=9,
-        leading=12,
+        fontSize=8.5,
+        leading=11.5,
         textColor=c_primary
+    )
+    
+    repo_link_style = ParagraphStyle(
+        'Repo_Link',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8.5,
+        leading=11.5,
+        textColor=colors.HexColor("#1D4ED8")
     )
     
     story = []
@@ -147,42 +156,44 @@ def build_pdf():
     # Document Header
     story.append(Paragraph("MLOps Tool Setup & Debugging — Internal POE", title_style))
     story.append(Paragraph("DevOps Engineer UAT Dry Run & Tool Integration Summary", subtitle_style))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=c_accent, spaceBefore=2, spaceAfter=10))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=c_accent, spaceBefore=2, spaceAfter=8))
     
-    # Metadata Card Table
+    # Metadata Card Table with GitHub Repository Link
     meta_data = [
         [Paragraph("Candidate Name:", meta_bold), Paragraph("Abhi Trambadiya", meta_style),
          Paragraph("Course / Sem:", meta_bold), Paragraph("Lab MLDevOps (Sem 07)", meta_style)],
         [Paragraph("Roll Number:", meta_bold), Paragraph("A36 (Div A, Roll 36)", meta_style),
          Paragraph("PRN:", meta_bold), Paragraph("2324000344", meta_style)],
         [Paragraph("Role Assumed:", meta_bold), Paragraph("DevOps Engineer (UAT Dry Run)", meta_style),
-         Paragraph("GitHub Account:", meta_bold), Paragraph("abhitrambadiya", meta_style)],
-        [Paragraph("Execution Date:", meta_bold), Paragraph("October 30, 2026", meta_style),
-         Paragraph("Evaluation:", meta_bold), Paragraph("Internal Practical Oral Exam (POE)", meta_style)]
+         Paragraph("Evaluation:", meta_bold), Paragraph("Internal Practical Oral Exam (POE)", meta_style)],
+        [Paragraph("GitHub Repository:", meta_bold),
+         Paragraph(f'<a href="{GITHUB_REPO_URL}"><u>{GITHUB_REPO_URL}</u></a>', repo_link_style),
+         Paragraph("Execution Date:", meta_bold), Paragraph("October 30, 2026", meta_style)]
     ]
-    t_meta = Table(meta_data, colWidths=[100, 150, 100, 154])
+    t_meta = Table(meta_data, colWidths=[100, 180, 85, 139])
     t_meta.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), c_bg_light),
         ('BOX', (0,0), (-1,-1), 1, c_border),
         ('INNERGRID', (0,0), (-1,-1), 0.5, c_border),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('TOPPADDING', (0,0), (-1,-1), 3.5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
         ('LEFTPADDING', (0,0), (-1,-1), 6),
         ('RIGHTPADDING', (0,0), (-1,-1), 6),
     ]))
     story.append(t_meta)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
     
     # Section 1: Objective & Scope
     story.append(Paragraph("1. Executive Summary & Purpose", h1_style))
     story.append(Paragraph(
-        "Modern Machine Learning systems deployed to production face catastrophic failures when infrastructure, dependencies, and input data shift unexpectedly. "
+        "Modern Machine Learning systems deployed to production face critical runtime disruptions when infrastructure environments, dependencies, and input data distributions drift unexpectedly. "
         "As part of the MLOps Internal POE, this project establishes a hardened UAT (User Acceptance Testing) dry run workflow across the entire DevOps/MLOps stack: "
         "VSCode and Git version control, lightweight containerization with Docker, automated unit testing with Pytest, declarative CI/CD orchestration with Jenkins, "
-        "and data drift observability with Evidently AI.",
+        "and data drift observability with Evidently AI. All codebase, test suites, and configuration artifacts are tracked and publicly accessible at: "
+        f'<b><a href="{GITHUB_REPO_URL}">{GITHUB_REPO_URL}</a></b>.',
         body_style
     ))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     
     # Section 2: Summary Report of Installation & Tool Status Table
     story.append(Paragraph("2. Tool Implementation & Installation Summary Report", h1_style))
@@ -190,7 +201,7 @@ def build_pdf():
     summary_rows = [
         summary_headers,
         [Paragraph("<b>VSCode + Git</b>", meta_style),
-         Paragraph("<code>git init<br/>git add .<br/>git commit -m 'feat: ...'<br/>git push origin main</code>", code_style),
+         Paragraph("<code>git init<br/>git add .<br/>git commit -m 'feat: ...'<br/>git remote add origin https://github.com/...</code>", code_style),
          Paragraph("<font color='#16A34A'><b>Successful</b></font><br/>Structured workspace & GitHub integration active.", meta_style)],
         [Paragraph("<b>Pytest</b>", meta_style),
          Paragraph("<code>pip install pytest<br/>pytest tests/ -v</code>", code_style),
@@ -211,13 +222,13 @@ def build_pdf():
         ('BOX', (0,0), (-1,-1), 1, c_border),
         ('INNERGRID', (0,0), (-1,-1), 0.5, c_border),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('TOPPADDING', (0,0), (-1,-1), 3.5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
         ('LEFTPADDING', (0,0), (-1,-1), 6),
         ('RIGHTPADDING', (0,0), (-1,-1), 6),
     ]))
     story.append(t_summary)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
     
     # Section 3: Output Log & Verification
     story.append(Paragraph("3. Execution Output & Verification Logs", h1_style))
@@ -252,13 +263,13 @@ def build_pdf():
         ('INNERGRID', (0,0), (-1,-1), 0.5, c_border),
         ('BACKGROUND', (1,1), (1,-1), colors.HexColor("#F1F5F9")),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('TOPPADDING', (0,0), (-1,-1), 3.5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
         ('LEFTPADDING', (0,0), (-1,-1), 6),
         ('RIGHTPADDING', (0,0), (-1,-1), 6),
     ]))
     story.append(t_out)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
     
     # Section 4: Jenkins Pipeline Configuration
     story.append(Paragraph("4. Jenkins Declarative Pipeline Architecture", h1_style))
@@ -269,14 +280,15 @@ def build_pdf():
         "<b>Stage 5: Container UAT Dry Run</b> &rarr; <b>Stage 6: Evidently Model & Data Drift Validation</b>.",
         body_style
     ))
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 5))
 
     # Section 5: Outcomes & Technical Insights
     story.append(Paragraph("5. Outcomes & Production Readiness", h1_style))
     story.append(Paragraph(
         "<b>1. Zero Environmental Discrepancy:</b> Packaging with Alpine Python ensures deterministic container runtimes across local macOS, Windows lab machines, and Linux CI/CD runners.<br/>"
         "<b>2. Shift-Left Quality Gates:</b> Automated Pytest test execution catches logical flaws prior to containerization and packaging.<br/>"
-        "<b>3. Statistical Data Observability:</b> Implementing Kolmogorov-Smirnov (KS) tests via Evidently AI guarantees that production data divergence is detected immediately prior to model degradation.",
+        "<b>3. Statistical Data Observability:</b> Implementing Kolmogorov-Smirnov (KS) tests via Evidently AI guarantees that production data divergence is detected immediately prior to model degradation.<br/>"
+        f'<b>4. Version Controlled & Auditable:</b> All code and manifests are hosted on GitHub: <a href="{GITHUB_REPO_URL}"><u>{GITHUB_REPO_URL}</u></a>.',
         body_style
     ))
     
